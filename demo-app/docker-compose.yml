@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # Spring Backend
+  backend:
+    build: ./backend  # Путь к папке с Spring приложением
+    # Или используй готовый образ:
+    # image: your-spring-app:latest
+    container_name: spring-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - app-network
+    # Если нужна база данных, добавь depends_on:
+    # depends_on:
+    #   - database
+
+  # React Frontend
+  frontend:
+    build: ./demo-app  # Путь к папке с React приложением
+    container_name: react-frontend
+    ports:
+      - "3000:80"  # Внешний порт 3000, внутренний 80 (nginx)
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  # Если нужна база данных (например, PostgreSQL)
+  # database:
+  #   image: postgres:15
+  #   container_name: postgres-db
+  #   environment:
+  #     POSTGRES_DB: myapp
+  #     POSTGRES_USER: user
+  #     POSTGRES_PASSWORD: password
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+# volumes:
+#   postgres_data:
